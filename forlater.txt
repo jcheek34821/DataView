@@ -1,0 +1,48 @@
+def save_video():
+    global end_program
+    global is_paused
+    is_paused = True
+    print("Video paused...")
+    print("Saving video...")
+    # Read the video from specified path
+    cam = cv2.VideoCapture(video_string)
+
+    # frame
+    currentframe = 0
+    width = 1920
+    height = 1080
+
+    mp4string = "new_video.mp4"
+    path_count = 1
+
+    while os.path.exists(destination_string + "/" + mp4string):
+        mp4string = "new_video(" + str(path_count) + ").mp4"
+        path_count += 1
+
+    # choose codec according to format needed
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    video = cv2.VideoWriter(destination_string + "/" + mp4string, fourcc, 30, (width, height))
+    cam.set(1, current_frame_array[0][0])
+    while True:
+        # reading from frame
+        ret, frame = cam.read()
+        if ret:
+            # writing the extracted images
+            if check_frame(currentframe):
+                video.write(frame)
+            else:
+                cam.set(1, get_next_frame(currentframe))
+                currentframe = int(cam.get(cv2.CAP_PROP_POS_FRAMES))
+
+            # increasing counter so that it will
+            # show how many frames are created
+            currentframe += 1
+            if currentframe > current_frame_array[len(current_frame_array) - 1][1]:
+                break
+        else:
+            break
+
+    cam.release()
+    video.release()
+    print("Video saved")
+    end_program = True
